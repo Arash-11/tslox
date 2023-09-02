@@ -1,0 +1,16 @@
+{
+  "name": "tslox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node dist/tslox.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.5.8",
+    "typescript": "^5.2.2"
+  }
+}
