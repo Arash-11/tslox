@@ -1,65 +1,68 @@
 import fs from 'fs';
 import readline from 'readline';
+import { tokens } from './types.js';
+import Scanner from './Scanner.js';
 
-let hadError = false;
+export default class Tslox {
+  static hadError = false;
 
-function report(line: number, where: string, message: string) {
-  console.error(`[line ${line}] Error ${where}: ${message}`);
-  hadError = true;
-}
+  static main() {
+    const args = process.argv.slice(2);
 
-function error(line: number, message: string) {
-  report(line, '', message);
-}
-
-function scanTokens(source: string): Token[] {}
-
-function run(source: string) {
-  const tokens: Token[] = scanTokens(source);
-
-  // For now, just print the tokens.
-  for (const token of tokens) {
-    console.log(token);
+    console.log('args.length: ', args.length);
+  
+    if (args.length > 1) {
+      console.log("Usage: tslox [script]");
+      process.exit(64);
+    } else if (args.length === 1) {
+      this.runFile(args[0]);
+    } else {
+      this.runPrompt();
+    }
   }
-}
 
-function runFile(path: string) {
-  const fileContents = fs.readFileSync(path, 'utf-8');
-  run(fileContents);
+  static error(line: number, message: string) {
+    this.report(line, '', message);
+  }
 
-  // Indicate an error in the exit code.
-  if (hadError) process.exit(65);
-}
+  private static runFile(path: string) {
+    const fileContents = fs.readFileSync(path, 'utf-8');
+    this.run(fileContents);
+  
+    // Indicate an error in the exit code.
+    if (Tslox.hadError) process.exit(65);
+  }
 
-function runPrompt() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: '> ',
-  });
-
-  rl.prompt();
-
-  rl.on('line', line => {
-    run(line);
-    hadError = false;
+  private static runPrompt() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      prompt: '> ',
+    });
+  
     rl.prompt();
-  }).on('close', () => {
-    process.exit(0)
-  });
-}
+  
+    rl.on('line', line => {
+      this.run(line);
+      Tslox.hadError = false;
+      rl.prompt();
+    }).on('close', () => {
+      process.exit(0)
+    });
+  }
 
-function main() {
-  const args = process.argv.slice(2);
+  private static run(source: string) {
+    const scanner = new Scanner(source);
+    const tokens: tokens = scanner.scanTokens();
+  
+    // For now, just print the tokens.
+    for (const token of tokens) {
+      console.log(token);
+    }
+  }
 
-  if (args.length > 1) {
-    console.log("Usage: tslox [script]");
-    process.exit(64);
-  } else if (args.length === 1) {
-    runFile(args[0]);
-  } else {
-    runPrompt();
+  private static report(line: number, where: string, message: string) {
+    console.error(`[line ${line}] Error ${where}: ${message}`);
+    Tslox.hadError = true;
   }
 }
-
-main();
