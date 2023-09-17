@@ -7,8 +7,6 @@ import Error from './error.js';
 export default class Tslox {
   static main() {
     const args = process.argv.slice(2);
-
-    console.log('args.length: ', args.length);
   
     if (args.length > 1) {
       console.log("Usage: tslox [script]");
