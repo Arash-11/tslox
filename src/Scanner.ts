@@ -1,5 +1,6 @@
 import { TokenType, tokens } from './types.js';
 import Token from './token.js';
+import Error from './error.js';
 
 export default class Scanner {
   private source: string;
@@ -44,7 +45,9 @@ export default class Scanner {
       case '-': this.addToken(TokenType.MINUS); break;
       case '+': this.addToken(TokenType.PLUS); break;
       case ';': this.addToken(TokenType.SEMICOLON); break;
-      case '*': this.addToken(TokenType.STAR); break; 
+      default:
+        Error.error(this.line, 'Unexpected character.');
+        break;
     }
   }
 

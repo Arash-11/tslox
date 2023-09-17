@@ -2,10 +2,9 @@ import fs from 'fs';
 import readline from 'readline';
 import { tokens } from './types.js';
 import Scanner from './Scanner.js';
+import Error from './error.js';
 
 export default class Tslox {
-  static hadError = false;
-
   static main() {
     const args = process.argv.slice(2);
 
@@ -21,16 +20,12 @@ export default class Tslox {
     }
   }
 
-  static error(line: number, message: string) {
-    this.report(line, '', message);
-  }
-
   private static runFile(path: string) {
     const fileContents = fs.readFileSync(path, 'utf-8');
     this.run(fileContents);
   
     // Indicate an error in the exit code.
-    if (Tslox.hadError) process.exit(65);
+    if (Error.hadError) process.exit(65);
   }
 
   private static runPrompt() {
@@ -44,7 +39,7 @@ export default class Tslox {
   
     rl.on('line', line => {
       this.run(line);
-      Tslox.hadError = false;
+      Error.hadError = false;
       rl.prompt();
     }).on('close', () => {
       process.exit(0)
@@ -59,10 +54,5 @@ export default class Tslox {
     for (const token of tokens) {
       console.log(token);
     }
-  }
-
-  private static report(line: number, where: string, message: string) {
-    console.error(`[line ${line}] Error ${where}: ${message}`);
-    Tslox.hadError = true;
   }
 }
