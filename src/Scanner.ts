@@ -8,6 +8,7 @@ export default class Scanner {
   private start: number;
   private current: number;
   private line: number;
+  private keywords: Map<string, TokenType>;
 
   constructor(source: string) {
     this.source = source;
@@ -15,6 +16,24 @@ export default class Scanner {
     this.start = 0;
     this.current = 0;
     this.line = 1;
+
+    this.keywords = new Map();
+    this.keywords.set('and',    TokenType.AND);
+    this.keywords.set('class',  TokenType.CLASS);
+    this.keywords.set('else',   TokenType.ELSE);
+    this.keywords.set('false',  TokenType.FALSE);
+    this.keywords.set('for',    TokenType.FOR);
+    this.keywords.set('fun',    TokenType.FUN);
+    this.keywords.set('if',     TokenType.IF);
+    this.keywords.set('nil',    TokenType.NIL);
+    this.keywords.set('or',     TokenType.OR);
+    this.keywords.set('print',  TokenType.PRINT);
+    this.keywords.set('return', TokenType.RETURN);
+    this.keywords.set('super',  TokenType.SUPER);
+    this.keywords.set('this',   TokenType.THIS);
+    this.keywords.set('true',   TokenType.TRUE);
+    this.keywords.set('var',    TokenType.VAR);
+    this.keywords.set('while',  TokenType.WHILE);
   }
 
   scanTokens(): tokens {
@@ -76,6 +95,8 @@ export default class Scanner {
       default:
         if (this.isDigit(c)) {
           this.number();
+        } else if (this.isAlpha(c)) {
+          this.identifier();
         } else {
           Error.error(this.line, 'Unexpected character.');
         }
@@ -114,6 +135,16 @@ export default class Scanner {
     return c >= '0' && c <= '9'
   }
 
+  private isAlpha(c: string): boolean {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+            c === '_';
+  }
+
+  private isAlphaNumeric(c: string): boolean {
+    return this.isAlpha(c) || this.isDigit(c);
+  }
+
   private string() {
     while (this.peek() !== '"' && !this.isAtEnd()) {
       if (this.peek() === '\n') this.line++;
@@ -144,5 +175,14 @@ export default class Scanner {
     }
 
     this.addToken(TokenType.NUMBER, parseFloat(this.source.substring(this.start, this.current)));
+  }
+
+  private identifier() {
+    while (this.isAlphaNumeric(this.peek())) this.advance();
+
+    const text = this.source.substring(this.start, this.current);
+    let type = this.keywords.get(text);
+    if (type === undefined) type = TokenType.IDENTIFIER;
+    this.addToken(type);
   }
 }
