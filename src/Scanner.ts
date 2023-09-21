@@ -1,6 +1,6 @@
-import { TokenType, tokens } from './types.js';
-import Token from './token.js';
-import Error from './error.js';
+import { TokenType, tokens } from './types';
+import Token from './token';
+import Error from './error';
 
 export default class Scanner {
   private source: string;

@@ -1,4 +1,4 @@
-import Token from './token.js';
+import Token from './token';
 
 export enum TokenType {
   // Single-character tokens.

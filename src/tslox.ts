@@ -1,8 +1,8 @@
 import fs from 'fs';
 import readline from 'readline';
-import { tokens } from './types.js';
-import Scanner from './Scanner.js';
-import Error from './error.js';
+import { tokens } from './types';
+import Scanner from './Scanner';
+import Error from './error';
 
 export default class Tslox {
   static main() {

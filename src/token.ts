@@ -1,4 +1,4 @@
-import { TokenType } from './types.js';
+import { TokenType } from './types';
 
 export default class Token {
   type: TokenType;

@@ -1,3 +1,3 @@
-import Tslox from './tslox.js';
+import Tslox from './tslox';
 
 Tslox.main();
