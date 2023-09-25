@@ -4,20 +4,15 @@ import Error from './error';
 
 export default class Scanner {
   private source: string;
-  private tokens: tokens;
-  private start: number;
-  private current: number;
-  private line: number;
-  private keywords: Map<string, TokenType>;
+  private tokens: tokens = [];
+  private start: number = 0;
+  private current: number = 0;
+  private line: number = 1;
+  private keywords: Map<string, TokenType> = new Map();
 
   constructor(source: string) {
     this.source = source;
-    this.tokens = [];
-    this.start = 0;
-    this.current = 0;
-    this.line = 1;
 
-    this.keywords = new Map();
     this.keywords.set('and',    TokenType.AND);
     this.keywords.set('class',  TokenType.CLASS);
     this.keywords.set('else',   TokenType.ELSE);

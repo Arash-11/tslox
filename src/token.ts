@@ -1,17 +1,12 @@
 import { TokenType } from './types';
 
 export default class Token {
-  type: TokenType;
-  lexeme: string;
-  literal: object | null;
-  line: number;
-
-  constructor(type: TokenType, lexeme: string, literal: object | null, line: number) {
-    this.type = type;
-    this.lexeme = lexeme;
-    this.literal = literal;
-    this.line = line;
-  }
+  constructor(
+    public type: TokenType,
+    public lexeme: string,
+    public literal: object | null,
+    public line: number
+  ) {}
 
   toString(): string {
     return `${this.type} ${this.lexeme} ${this.literal}`;
