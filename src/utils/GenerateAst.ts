@@ -20,7 +20,7 @@ class GenerateAst {
   }
 
   private static defineAst(outputDir: string, baseName: string, types: string[]) {
-    const filePath = path.join(outputDir, `${baseName}.ts`);
+    const filePath = path.join(outputDir, `${baseName.toLowerCase()}.ts`);
 
     // Replace content if file already exists
     fs.writeFileSync(filePath, "import Token from './token';\n");

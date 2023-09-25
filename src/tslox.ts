@@ -1,7 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
 import { tokens } from './types';
-import Scanner from './Scanner';
+import Scanner from './scanner';
 import Error from './error';
 
 export default class Tslox {
