@@ -23,7 +23,7 @@ class GenerateAst {
     const filePath = path.join(outputDir, `${baseName.toLowerCase()}.ts`);
 
     // Replace content if file already exists
-    fs.writeFileSync(filePath, "import Token from './token';\n");
+    fs.writeFileSync(filePath, "import { Token } from './token';\n");
 
     this.defineVisitor(filePath, baseName, types);
 

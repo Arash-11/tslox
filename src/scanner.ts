@@ -1,10 +1,9 @@
-import { TokenType, tokens } from './types';
-import Token from './token';
+import { TokenType, Token } from './token';
 import Error from './error';
 
 export default class Scanner {
   private source: string;
-  private tokens: tokens = [];
+  private tokens: Token[] = [];
   private start: number = 0;
   private current: number = 0;
   private line: number = 1;
@@ -13,25 +12,25 @@ export default class Scanner {
   constructor(source: string) {
     this.source = source;
 
-    this.keywords.set('and',    TokenType.AND);
-    this.keywords.set('class',  TokenType.CLASS);
-    this.keywords.set('else',   TokenType.ELSE);
-    this.keywords.set('false',  TokenType.FALSE);
-    this.keywords.set('for',    TokenType.FOR);
-    this.keywords.set('fun',    TokenType.FUN);
-    this.keywords.set('if',     TokenType.IF);
-    this.keywords.set('nil',    TokenType.NIL);
-    this.keywords.set('or',     TokenType.OR);
-    this.keywords.set('print',  TokenType.PRINT);
-    this.keywords.set('return', TokenType.RETURN);
-    this.keywords.set('super',  TokenType.SUPER);
-    this.keywords.set('this',   TokenType.THIS);
-    this.keywords.set('true',   TokenType.TRUE);
-    this.keywords.set('var',    TokenType.VAR);
-    this.keywords.set('while',  TokenType.WHILE);
+    this.keywords.set('and',    TokenType.AND)
+                 .set('class',  TokenType.CLASS)
+                 .set('else',   TokenType.ELSE)
+                 .set('false',  TokenType.FALSE)
+                 .set('for',    TokenType.FOR)
+                 .set('fun',    TokenType.FUN)
+                 .set('if',     TokenType.IF)
+                 .set('nil',    TokenType.NIL)
+                 .set('or',     TokenType.OR)
+                 .set('print',  TokenType.PRINT)
+                 .set('return', TokenType.RETURN)
+                 .set('super',  TokenType.SUPER)
+                 .set('this',   TokenType.THIS)
+                 .set('true',   TokenType.TRUE)
+                 .set('var',    TokenType.VAR)
+                 .set('while',  TokenType.WHILE);
   }
 
-  scanTokens(): tokens {
+  scanTokens(): Token[] {
     while (!this.isAtEnd()) {
       // We are at the beginning of the next lexeme.
       this.start = this.current;

@@ -1,4 +1,4 @@
-import Token from './token';
+import { Token } from './token';
 
 interface ExprVisitor<R> {
   visitBinaryExpr(expr: Binary): R;
@@ -7,58 +7,40 @@ interface ExprVisitor<R> {
   visitUnaryExpr(expr: Unary): R;
 }
 
-interface Expr {
+export interface Expr {
   accept<R>(visitor: ExprVisitor<R>): R;
 }
 
-class Binary implements Expr {
-  left: Expr;
-  operator: Token;
-  right: Expr;
-
-  constructor(left: Expr, operator: Token, right: Expr) {
-    this.left = left;
-    this.operator = operator;
-    this.right = right;
-  }
+export class Binary implements Expr {
+  constructor(
+    public left: Expr,
+    public operator: Token,
+    public right: Expr
+  ) {}
 
   accept<R>(visitor: ExprVisitor<R>): R {
     return visitor.visitBinaryExpr(this);
   }
 }
 
-class Grouping implements Expr {
-  expression: Expr;
-
-  constructor(expression: Expr) {
-    this.expression = expression;
-  }
+export class Grouping implements Expr {
+  constructor(public expression: Expr) {}
 
   accept<R>(visitor: ExprVisitor<R>): R {
     return visitor.visitGroupingExpr(this);
   }
 }
 
-class Literal implements Expr {
-  value: object;
-
-  constructor(value: object) {
-    this.value = value;
-  }
+export class Literal implements Expr {
+  constructor(public value: object) {}
 
   accept<R>(visitor: ExprVisitor<R>): R {
     return visitor.visitLiteralExpr(this);
   }
 }
 
-class Unary implements Expr {
-  operator: Token;
-  right: Expr;
-
-  constructor(operator: Token, right: Expr) {
-    this.operator = operator;
-    this.right = right;
-  }
+export class Unary implements Expr {
+  constructor(public operator: Token, public right: Expr) {}
 
   accept<R>(visitor: ExprVisitor<R>): R {
     return visitor.visitUnaryExpr(this);
