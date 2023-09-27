@@ -32,7 +32,7 @@ export class Grouping implements Expr {
 }
 
 export class Literal implements Expr {
-  constructor(public value: object) {}
+  constructor(public value: object | boolean | null) {}
 
   accept<R>(visitor: ExprVisitor<R>): R {
     return visitor.visitLiteralExpr(this);
