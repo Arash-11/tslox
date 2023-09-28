@@ -26,7 +26,9 @@ export default class AstPrinter implements ExprVisitor<string> {
   }
 
   private parenthesize(name: string, exprs: Expr[]): string {
-    let builder = `(${name}`;
+    let builder = '(';
+
+    builder += `${name}`;
 
     for (const expr of exprs) {
       builder += ` ${expr.accept(this)}`;

@@ -5,9 +5,9 @@ export class Error {
 
   static error(token: Token, message: string) {
     if (token.type === TokenType.EOF) {
-      Error.report(token.line, ' at end', message);
+      Error.report(token.line, 'at end', message);
     } else {
-      Error.report(token.line, ` at '${token.lexeme}'`, message);
+      Error.report(token.line, `at '${token.lexeme}'`, message);
     }
   }
 

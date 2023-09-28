@@ -1,6 +1,5 @@
 import fs from 'fs';
 import readline from 'readline';
-import { Token } from './token';
 import Scanner from './scanner';
 import { Error } from './error';
 import Parser from './parser';
@@ -48,7 +47,7 @@ export default class Tslox {
 
   private static run(source: string) {
     const scanner = new Scanner(source);
-    const tokens: Token[] = scanner.scanTokens();
+    const tokens = scanner.scanTokens();
   
     const parser = new Parser(tokens);
     const expression = parser.parse();
