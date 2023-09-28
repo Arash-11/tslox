@@ -2,7 +2,7 @@ import { TokenType, Token } from './token';
 import { Expr, Binary, Unary, Literal, Grouping } from './expr';
 import { Error, ParseError } from './error';
 
-class Parser {
+export default class Parser {
   private tokens: Token[];
   private current: number = 0;
 

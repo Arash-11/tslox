@@ -2,7 +2,9 @@ import fs from 'fs';
 import readline from 'readline';
 import { Token } from './token';
 import Scanner from './scanner';
-import Error from './error';
+import { Error } from './error';
+import Parser from './parser';
+import AstPrinter from './utils/astPrinter';
 
 export default class Tslox {
   static main() {
@@ -48,9 +50,12 @@ export default class Tslox {
     const scanner = new Scanner(source);
     const tokens: Token[] = scanner.scanTokens();
   
-    // For now, just print the tokens.
-    for (const token of tokens) {
-      console.log(token);
-    }
+    const parser = new Parser(tokens);
+    const expression = parser.parse();
+
+    // Stop if there was a syntax error
+    if (Error.hadError) return;    
+
+    if (expression) console.log(new AstPrinter().print(expression));
   }
 }
