@@ -1,5 +1,5 @@
 import { TokenType, Token } from './token';
-import Error from './error';
+import { SyntaxError } from './error';
 
 export default class Scanner {
   private source: string;
@@ -92,7 +92,7 @@ export default class Scanner {
         } else if (this.isAlpha(c)) {
           this.identifier();
         } else {
-          Error.error(this.line, 'Unexpected character.');
+          new SyntaxError(this.line, 'Unexpected character.');
         }
         break;
     }
@@ -146,7 +146,7 @@ export default class Scanner {
     }
 
     if (this.isAtEnd()) {
-      Error.error(this.line, 'Unterminated string.');
+      new SyntaxError(this.line, 'Unterminated string.');
       return;
     }
 

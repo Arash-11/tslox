@@ -1,5 +1,6 @@
 import { TokenType, Token } from './token';
 import { Expr, Binary, Unary, Literal, Grouping } from './expr';
+import { Error, ParseError } from './error';
 
 class Parser {
   private tokens: Token[];
@@ -7,6 +8,15 @@ class Parser {
 
   constructor(tokens: Token[]) {
     this.tokens = tokens;
+  }
+
+  parse(): Expr | null {
+    try {
+      return this.expression();
+    } catch (err) {
+      if (err instanceof ParseError) return null;
+      throw err;
+    }
   }
 
   private expression(): Expr {
@@ -72,19 +82,21 @@ class Parser {
   }
 
   private primary(): Expr {
+    if (this.match([TokenType.FALSE])) return new Literal(false);
+    if (this.match([TokenType.TRUE])) return new Literal(true);
+    if (this.match([TokenType.NIL])) new Literal(null);
+
+    if (this.match([TokenType.NUMBER, TokenType.STRING])) {
+      return new Literal(this.previous().literal);
+    }
+
     if (this.match([TokenType.LEFT_PAREN])) {
       const expr = this.expression();
       this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
       return new Grouping(expr);
     }
 
-    if (this.match([TokenType.NUMBER, TokenType.STRING])) {
-      return new Literal(this.previous().literal);
-    }
-
-    if (this.match([TokenType.FALSE])) return new Literal(false);
-    if (this.match([TokenType.TRUE])) return new Literal(true);
-    return new Literal(null);
+    throw this.error(this.peek(), "Expect expression.");
   }
 
   private match(types: TokenType[]): boolean {
@@ -98,7 +110,13 @@ class Parser {
     return false;
   }
 
-  private consume(type: TokenType, msg: string) {}
+  private consume(type: TokenType, message: string) {
+    if (!this.check(type)) {
+      throw this.error(this.peek(), message);
+    }
+
+    return this.advance();
+  }
 
   private check(type: TokenType): boolean {
     if (this.isAtEnd()) return false;
@@ -120,5 +138,32 @@ class Parser {
 
   private previous(): Token {
     return this.tokens[this.current - 1];
+  }
+
+  private error(token: Token, message: string): ParseError {
+    Error.error(token, message);
+    return new ParseError();
+  }
+
+  private synchronize() {
+    this.advance();
+
+    while (!this.isAtEnd()) {
+      if (this.previous().type === TokenType.SEMICOLON) return;
+
+      switch (this.peek().type) {
+        case TokenType.CLASS:
+        case TokenType.FUN:
+        case TokenType.VAR:
+        case TokenType.FOR:
+        case TokenType.IF:
+        case TokenType.WHILE:
+        case TokenType.PRINT:
+        case TokenType.RETURN:
+          return;
+      }
+
+      this.advance();
+    }
   }
 }
