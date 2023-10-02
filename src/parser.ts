@@ -96,7 +96,7 @@ export default class Parser {
       return new Grouping(expr);
     }
 
-    throw this.error(this.peek(), "Expect expression.");
+    throw this.error(this.peek(), 'Expect expression.');
   }
 
   private match(types: TokenType[]): boolean {

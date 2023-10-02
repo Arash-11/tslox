@@ -10,7 +10,7 @@ export default class Tslox {
     const args = process.argv.slice(2);
   
     if (args.length > 1) {
-      console.log("Usage: tslox [script]");
+      console.log('Usage: tslox [script]');
       process.exit(64);
     } else if (args.length === 1) {
       this.runFile(args[0]);
