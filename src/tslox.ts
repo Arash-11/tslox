@@ -3,9 +3,11 @@ import readline from 'readline';
 import Scanner from './scanner';
 import { Error } from './error';
 import Parser from './parser';
-import AstPrinter from './utils/astPrinter';
+import Interpreter from './interpreter';
 
 export default class Tslox {
+  private static intrepreter = new Interpreter();
+
   static main() {
     const args = process.argv.slice(2);
   
@@ -25,6 +27,7 @@ export default class Tslox {
   
     // Indicate an error in the exit code.
     if (Error.hadError) process.exit(65);
+    if (Error.hadRuntimeError) process.exit(70);
   }
 
   private static runPrompt() {
@@ -55,6 +58,6 @@ export default class Tslox {
     // Stop if there was a syntax error
     if (Error.hadError) return;    
 
-    if (expression) console.log(new AstPrinter().print(expression));
+    if (expression) this.intrepreter.interpret(expression);
   }
 }
