@@ -83,7 +83,11 @@ export default class Interpreter implements ExprVisitor<Object> {
   }
 
   visitLiteralExpr(expr: Literal): Object {
-    return Object(expr.value);
+    if (typeof expr.value === 'number' || expr.value instanceof Number) {
+      return Number(expr.value);
+    }
+
+    return String(expr.value);
   }
 
   visitUnaryExpr(expr: Unary): Object {
