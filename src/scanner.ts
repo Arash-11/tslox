@@ -31,7 +31,7 @@ export default class Scanner {
   }
 
   scanTokens(): Token[] {
-    while (!this.isAtEnd()) {
+    while (!this.isAtEnd) {
       // We are at the beginning of the next lexeme.
       this.start = this.current;
       this.scanToken();
@@ -41,7 +41,7 @@ export default class Scanner {
     return this.tokens;
   }
 
-  private isAtEnd(): boolean {
+  private get isAtEnd(): boolean {
     return this.current >= this.source.length;
   }
 
@@ -74,7 +74,7 @@ export default class Scanner {
       case '/':
         if (this.match('/')) {
           // A comment goes until the end of the line.
-          while (this.peek() !== '\n' && !this.isAtEnd()) this.advance();
+          while (this.peek() !== '\n' && !this.isAtEnd) this.advance();
         } else {
           this.addToken(TokenType.SLASH);
         }
@@ -108,7 +108,7 @@ export default class Scanner {
   }
 
   private match(expected: string): boolean {
-    if (this.isAtEnd()) return false;
+    if (this.isAtEnd) return false;
     if (this.source.charAt(this.current) !== expected) return false;
 
     this.current++;
@@ -116,7 +116,7 @@ export default class Scanner {
   }
 
   private peek(): string {
-    if (this.isAtEnd()) return '\0';
+    if (this.isAtEnd) return '\0';
     return this.source.charAt(this.current);
   }
 
@@ -140,12 +140,12 @@ export default class Scanner {
   }
 
   private string() {
-    while (this.peek() !== '"' && !this.isAtEnd()) {
+    while (this.peek() !== '"' && !this.isAtEnd) {
       if (this.peek() === '\n') this.line++;
       this.advance();
     }
 
-    if (this.isAtEnd()) {
+    if (this.isAtEnd) {
       new SyntaxError(this.line, 'Unterminated string.');
       return;
     }

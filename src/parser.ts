@@ -119,16 +119,16 @@ export default class Parser {
   }
 
   private check(type: TokenType): boolean {
-    if (this.isAtEnd()) return false;
+    if (this.isAtEnd) return false;
     return this.peek().type === type;
   }
 
   private advance(): Token {
-    if (!this.isAtEnd()) this.current++;
+    if (!this.isAtEnd) this.current++;
     return this.previous();
   }
 
-  private isAtEnd(): boolean {
+  private get isAtEnd(): boolean {
     return this.peek().type == TokenType.EOF;
   }
 
@@ -148,7 +148,7 @@ export default class Parser {
   private synchronize() {
     this.advance();
 
-    while (!this.isAtEnd()) {
+    while (!this.isAtEnd) {
       if (this.previous().type === TokenType.SEMICOLON) return;
 
       switch (this.peek().type) {
