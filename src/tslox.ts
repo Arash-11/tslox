@@ -53,11 +53,11 @@ export default class Tslox {
     const tokens = scanner.scanTokens();
   
     const parser = new Parser(tokens);
-    const expression = parser.parse();
+    const statements = parser.parse();
 
     // Stop if there was a syntax error
     if (Error.hadError) return;    
 
-    if (expression) this.intrepreter.interpret(expression);
+    this.intrepreter.interpret(statements);
   }
 }

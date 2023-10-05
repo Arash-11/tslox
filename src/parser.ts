@@ -1,5 +1,6 @@
 import { TokenType, Token } from './token';
 import { Expr, Binary, Unary, Literal, Grouping } from './expr';
+import { Stmt, Print, Expression } from './stmt';
 import { Error, ParseError } from './error';
 
 export default class Parser {
@@ -10,17 +11,36 @@ export default class Parser {
     this.tokens = tokens;
   }
 
-  parse(): Expr | null {
-    try {
-      return this.expression();
-    } catch (err) {
-      if (err instanceof ParseError) return null;
-      throw err;
+  parse(): Stmt[] {
+    const statements: Stmt[] = [];
+
+    while (!this.isAtEnd) {
+      statements.push(this.statement());
     }
+
+    return statements;
   }
 
   private expression(): Expr {
     return this.equality();
+  }
+
+  private statement(): Stmt {
+    if (this.match([TokenType.PRINT])) return this.printStatement();
+
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Stmt {
+    const value = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+    return new Print(value);
+  }
+
+  private expressionStatement(): Stmt {
+    const expr  = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+    return new Expression(expr);
   }
 
   private equality(): Expr {

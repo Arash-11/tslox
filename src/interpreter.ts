@@ -1,19 +1,21 @@
 import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping } from './expr';
+import { StmtVisitor, Stmt, Expression, Print } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
 
-export default class Interpreter implements ExprVisitor<Object> {
-  interpret(expression: Expr) {
+export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<void> {
+  interpret(statements: Stmt[]) {
     try {
-      const value = this.evaluate(expression);
-      console.log(this.stringify(value));
+      for (const statement of statements) {
+        this.execute(statement);
+      }
     } catch (err) {
       if (err instanceof RuntimeError) {
         Error.runtimeError(err);
-        return;
+      } else {
+        // Unreachable
+        throw err;
       }
-      // Unreachable
-      throw err;
     }
   }
 
@@ -121,6 +123,19 @@ export default class Interpreter implements ExprVisitor<Object> {
 
   private evaluate(expr: Expr): Object {
     return expr.accept(this);
+  }
+
+  private execute(stmt: Stmt) {
+    stmt.accept(this);
+  }
+
+  visitExpressionStmt(stmt: Expression) {
+    this.evaluate(stmt.expression);
+  }
+
+  visitPrintStmt(stmt: Print): void {
+    const value = this.evaluate(stmt.expression);
+    console.log(this.stringify(value));
   }
 
   private isTruthy(object: Object): boolean {
