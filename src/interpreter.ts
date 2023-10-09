@@ -1,9 +1,12 @@
-import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping } from './expr';
-import { StmtVisitor, Stmt, Expression, Print } from './stmt';
+import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping, Variable } from './expr';
+import { StmtVisitor, Stmt, Expression, Print, Var } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
+import Environment from './environment';
 
 export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<void> {
+  private environment = new Environment();
+
   interpret(statements: Stmt[]) {
     try {
       for (const statement of statements) {
@@ -107,6 +110,10 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
     return Object(null);
   }
 
+  visitVariableExpr(expr: Variable): Object {
+    return this.environment.get(expr.name);
+  }
+
   private checkNumberOperand(operator: Token, operand: Object) {
     if (typeof operand === 'number' || operand instanceof Number) return;
     throw new RuntimeError(operator, 'Operand must be a number.');
@@ -133,9 +140,14 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
     this.evaluate(stmt.expression);
   }
 
-  visitPrintStmt(stmt: Print): void {
+  visitPrintStmt(stmt: Print) {
     const value = this.evaluate(stmt.expression);
     console.log(this.stringify(value));
+  }
+
+  visitVarStmt(stmt: Var) {
+    const value = stmt.initializer !== null ? this.evaluate(stmt.initializer) : null;
+    this.environment.define(stmt.name.lexeme, value);
   }
 
   private isTruthy(object: Object): boolean {
