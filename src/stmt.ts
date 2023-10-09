@@ -1,4 +1,5 @@
 import { Expr } from './expr';
+import { Token } from './token';
 
 export interface StmtVisitor<R> {
   visitBlockStmt(stmt: Block): R;
@@ -42,6 +43,12 @@ export class Print implements Stmt {
 
 export class Return implements Stmt {}
 
-export class Var implements Stmt {}
+export class Var implements Stmt {
+  constructor(public name: Token, public initializer: Expr | null) {}
+
+  accept<R>(visitor: StmtVisitor<R>): R {
+    return visitor.visitVarStmt(this);
+  }
+}
 
 export class While implements Stmt {}
