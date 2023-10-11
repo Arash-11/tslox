@@ -1,8 +1,8 @@
 ## tslox
 
-TypeScript implementation of the Lox tree-walk interpreter
+TypeScript implementation of the Lox tree-walk interpreter.
 
-### Grammar
+### Grammar (represented in a custom Extended Backus-Naur Form)
 ```
 program        → declaration* EOF ;
 
@@ -20,7 +20,10 @@ printStmt      → "print" expression ";" ;
 
 
 
-expression     → equality ;
+expression     → assignment ;
+
+assignment     → IDENTIFIER "=" assignment
+               | equality ;
 
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 
