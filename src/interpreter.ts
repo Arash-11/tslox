@@ -1,4 +1,4 @@
-import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping, Variable } from './expr';
+import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
 import { StmtVisitor, Stmt, Expression, Print, Var } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
@@ -148,6 +148,12 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
   visitVarStmt(stmt: Var) {
     const value = stmt.initializer !== null ? this.evaluate(stmt.initializer) : null;
     this.environment.define(stmt.name.lexeme, value);
+  }
+
+  visitAssignExpr(expr: Assign): Object {
+    const value = this.evaluate(expr.value);
+    this.environment.assign(expr.name, value);
+    return value;
   }
 
   private isTruthy(object: Object): boolean {
