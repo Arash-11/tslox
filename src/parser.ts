@@ -1,6 +1,6 @@
 import { TokenType, Token } from './token';
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
-import { Stmt, Print, Expression, Var } from './stmt';
+import { Stmt, Block, Expression, Print, Var } from './stmt';
 import { Error, ParseError } from './error';
 
 export default class Parser {
@@ -16,7 +16,7 @@ export default class Parser {
 
     while (!this.isAtEnd) {
       const declaration = this.declaration();
-      if (declaration !== null) statements.push(declaration);
+      if (declaration) statements.push(declaration);
     }
 
     return statements;
@@ -48,6 +48,7 @@ export default class Parser {
 
   private statement(): Stmt {
     if (this.match([TokenType.PRINT])) return this.printStatement();
+    if (this.match([TokenType.LEFT_BRACE])) return new Block(this.block());
 
     return this.expressionStatement();
   }
@@ -62,6 +63,18 @@ export default class Parser {
     const expr  = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
+  }
+
+  private block(): Stmt[] {
+    const statements: Stmt[] = [];
+
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd) {
+      const declaration = this.declaration();
+      if (declaration) statements.push(declaration);
+    }
+
+    this.consume(TokenType.RIGHT_BRACE, "Expect ')' after block.");
+    return statements;
   }
 
   private expression(): Expr {
@@ -100,7 +113,7 @@ export default class Parser {
   private comparison(): Expr {
     let expr = this.term();
 
-    while(this.match([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL])) {
+    while (this.match([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL])) {
       const operator = this.previous();
       const right = this.term();
       expr = new Binary(expr, operator, right);

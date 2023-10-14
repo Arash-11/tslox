@@ -17,7 +17,13 @@ export interface Stmt {
   accept<R>(visitor: StmtVisitor<R>): R;
 }
 
-export class Block implements Stmt {}
+export class Block implements Stmt {
+  constructor(public statements: Stmt[]) {}
+
+  accept<R>(visitor: StmtVisitor<R>): R {
+    return visitor.visitBlockStmt(this);
+  }
+}
 
 export class Class implements Stmt {}
 

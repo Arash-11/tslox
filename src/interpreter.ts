@@ -1,5 +1,5 @@
 import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
-import { StmtVisitor, Stmt, Expression, Print, Var } from './stmt';
+import { StmtVisitor, Stmt, Block, Expression, Print, Var } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
 import Environment from './environment';
@@ -134,6 +134,23 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
 
   private execute(stmt: Stmt) {
     stmt.accept(this);
+  }
+
+  executeBlock(statements: Stmt[], environment: Environment) {
+    const previous = this.environment;
+    try {
+      this.environment = environment;
+      for (const statement of statements) {
+        this.execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
+  }
+
+  visitBlockStmt(stmt: Block) {
+    this.executeBlock(stmt.statements, new Environment(this.environment));
+    return null;
   }
 
   visitExpressionStmt(stmt: Expression) {
