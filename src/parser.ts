@@ -1,6 +1,6 @@
 import { TokenType, Token } from './token';
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
-import { Stmt, Block, Expression, Print, Var } from './stmt';
+import { Expr, Binary, Grouping, Literal, Logical, Unary, Variable, Assign } from './expr';
+import { Stmt, Block, Expression, If, Print, Var } from './stmt';
 import { Error, ParseError } from './error';
 
 export default class Parser {
@@ -47,10 +47,23 @@ export default class Parser {
   }
 
   private statement(): Stmt {
+    if (this.match([TokenType.IF])) return this.ifStatement();
     if (this.match([TokenType.PRINT])) return this.printStatement();
     if (this.match([TokenType.LEFT_BRACE])) return new Block(this.block());
 
     return this.expressionStatement();
+  }
+
+  private ifStatement(): Stmt {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+    const condition = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+    const thenBranch = this.statement();
+    let elseBranch: Stmt | null = null;
+    if (this.match([TokenType.ELSE])) elseBranch = this.statement();
+
+    return new If(condition, thenBranch, elseBranch);
   }
 
   private printStatement(): Stmt {
@@ -82,7 +95,7 @@ export default class Parser {
   }
 
   private assignment(): Expr {
-    const expr = this.equality();
+    const expr = this.or();
 
     if (this.match([TokenType.EQUAL])) {
       const equals = this.previous();
@@ -93,6 +106,30 @@ export default class Parser {
       }
 
       this.error(equals, 'Invalid assignment target.');
+    }
+
+    return expr;
+  }
+
+  private or(): Expr {
+    let expr = this.and();
+
+    while (this.match([TokenType.OR])) {
+      const operator = this.previous();
+      const right = this.and();
+      expr = new Logical(expr, operator, right);
+    }
+
+    return expr;
+  }
+
+  private and(): Expr {
+    let expr = this.equality();
+
+    while (this.match([TokenType.AND])) {
+      const operator = this.previous();
+      const right = this.equality();
+      expr = new Logical(expr, operator, right);
     }
 
     return expr;
@@ -159,7 +196,7 @@ export default class Parser {
   private primary(): Expr {
     if (this.match([TokenType.FALSE])) return new Literal(false);
     if (this.match([TokenType.TRUE])) return new Literal(true);
-    if (this.match([TokenType.NIL])) new Literal(null);
+    if (this.match([TokenType.NIL])) return new Literal(null);
 
     if (this.match([TokenType.NUMBER, TokenType.STRING])) {
       return new Literal(this.previous().literal);

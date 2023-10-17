@@ -1,5 +1,5 @@
-import { ExprVisitor, Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
-import { StmtVisitor, Stmt, Block, Expression, Print, Var } from './stmt';
+import { ExprVisitor, Expr, Binary, Unary, Literal, Logical, Grouping, Variable, Assign } from './expr';
+import { StmtVisitor, Stmt, Block, Expression, If, Print, Var } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
 import Environment from './environment';
@@ -88,11 +88,23 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
   }
 
   visitLiteralExpr(expr: Literal): Object {
-    if (typeof expr.value === 'number' || expr.value instanceof Number) {
-      return Number(expr.value);
+    if (expr.value === null) {
+      return null as unknown as Object;
     }
 
-    return String(expr.value);
+    return expr.value;
+  }
+
+  visitLogicalExpr(expr: Logical): Object {
+    const left = this.evaluate(expr.left);
+
+    if (expr.operator.type === TokenType.OR) {
+      if (this.isTruthy(left)) return left;
+    } else {
+      if (!this.isTruthy(left)) return left;
+    }
+
+    return this.evaluate(expr.right);
   }
 
   visitUnaryExpr(expr: Unary): Object {
@@ -155,6 +167,14 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
 
   visitExpressionStmt(stmt: Expression) {
     this.evaluate(stmt.expression);
+  }
+
+  visitIfStmt(stmt: If) {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else if (stmt.elseBranch) {
+      this.execute(stmt.elseBranch);
+    }
   }
 
   visitPrintStmt(stmt: Print) {

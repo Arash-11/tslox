@@ -102,7 +102,7 @@ export default class Scanner {
     return this.source.charAt(this.current++);
   }
 
-  private addToken(type: TokenType, literal: Object | null = null) {
+  private addToken(type: TokenType, literal: object | null = null) {
     const text = this.source.substring(this.start, this.current);
     this.tokens.push(new Token(type, text, literal, this.line));
   }
@@ -155,7 +155,7 @@ export default class Scanner {
 
     // Trim the surrounding quotes.
     const value = this.source.substring(this.start + 1, this.current - 1);
-    this.addToken(TokenType.STRING, value);
+    this.addToken(TokenType.STRING, new String(value));
   }
 
   private number() {
@@ -168,7 +168,7 @@ export default class Scanner {
       while (this.isDigit(this.peek())) this.advance();
     }
 
-    this.addToken(TokenType.NUMBER, parseFloat(this.source.substring(this.start, this.current)));
+    this.addToken(TokenType.NUMBER, new Number(parseFloat(this.source.substring(this.start, this.current))));
   }
 
   private identifier() {
