@@ -37,7 +37,17 @@ export class Expression implements Stmt {
 
 export class Function implements Stmt {}
 
-export class If implements Stmt {}
+export class If implements Stmt {
+  constructor(
+    public condition: Expr,
+    public thenBranch: Stmt,
+    public elseBranch: Stmt | null
+  ) {}
+
+  accept<R>(visitor: StmtVisitor<R>): R {
+    return visitor.visitIfStmt(this);
+  }
+}
 
 export class Print implements Stmt {
   constructor(public expression: Expr) {}
@@ -57,4 +67,10 @@ export class Var implements Stmt {
   }
 }
 
-export class While implements Stmt {}
+export class While implements Stmt {
+  constructor(public condition: Expr, public body: Stmt) {}
+
+  accept<R>(visitor: StmtVisitor<R>): R {
+    return visitor.visitWhileStmt(this);
+  }
+}

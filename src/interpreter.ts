@@ -1,5 +1,5 @@
 import { ExprVisitor, Expr, Binary, Unary, Literal, Logical, Grouping, Variable, Assign } from './expr';
-import { StmtVisitor, Stmt, Block, Expression, If, Print, Var } from './stmt';
+import { StmtVisitor, Stmt, Block, Expression, If, Print, Var, While } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
 import Environment from './environment';
@@ -185,6 +185,12 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
   visitVarStmt(stmt: Var) {
     const value = stmt.initializer !== null ? this.evaluate(stmt.initializer) : null;
     this.environment.define(stmt.name.lexeme, value);
+  }
+
+  visitWhileStmt(stmt: While) {
+    while (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.body);
+    }
   }
 
   visitAssignExpr(expr: Assign): Object {
