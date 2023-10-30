@@ -1,11 +1,25 @@
-import { ExprVisitor, Expr, Binary, Unary, Literal, Logical, Grouping, Variable, Assign } from './expr';
+import { ExprVisitor, Expr, Binary, Unary, Literal, Logical, Grouping, Variable, Assign, Call } from './expr';
 import { StmtVisitor, Stmt, Block, Expression, If, Print, Var, While } from './stmt';
 import { Token, TokenType } from './token';
 import { Error, RuntimeError } from './error';
 import Environment from './environment';
+import { LoxCallable } from './LoxCallable';
 
 export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<void> {
-  private environment = new Environment();
+  globals = new Environment();
+  private environment = this.globals;
+
+  constructor() {
+    this.globals.define('clock', new class implements LoxCallable {
+      arity(): number { return 0; }
+
+      call(interpreter: Interpreter, args: Object[]): Object {
+        return new Date().getTime() / 1000.0;
+      }
+
+      toString() { return "<native fn>"; }
+    });
+  }
 
   interpret(statements: Stmt[]) {
     try {
@@ -81,6 +95,25 @@ export default class Interpreter implements ExprVisitor<Object>, StmtVisitor<voi
 
     // Unreachable
     return Object(null);
+  }
+
+  visitCallExpr(expr: Call): Object {
+    const callee = this.evaluate(expr.callee) as LoxCallable;
+
+    const args: Object[] = [];
+    for (const arg of expr.args) {
+      args.push(this.evaluate(arg));
+    }
+
+    if (!(callee as LoxCallable)) {
+      throw new RuntimeError(expr.paren, 'Can only call functions and classes.');
+    }
+
+    const func = callee;
+    if (args.length != func.arity()) {
+      throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but got ${args.length}.`);
+    }
+    return func.call(this, args);
   }
 
   visitGroupingExpr(expr: Grouping): Object {
